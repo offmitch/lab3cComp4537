@@ -37,18 +37,18 @@ const server = http.createServer((req, res) => {
   const parsedUrl = new URL(fullUrl);
   
   // Check the pathname exactly
-  if (parsedUrl.pathname === "/writeFile") {
+  if (parsedUrl.pathname === "/writeFile/") {
     const text = parsedUrl.searchParams.get("text") || "Text goes here";
 
     // Append the text to file.txt
     fs.appendFileSync("file.txt", `${text}\n`);
 
-    const messenger = new Greet();
+    const messenger = new Messenger();
     res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end(`${text} : ${messenger.getMessage()}`);
+    res.end(`${text} : ${messenger.getSavedMessage()}`);
   } else {
     res.writeHead(404, { "Content-Type": "text/plain" });
-    res.end("Not Found");
+    res.end("didnt find it");
   }
 });
 
