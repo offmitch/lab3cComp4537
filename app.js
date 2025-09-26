@@ -32,23 +32,25 @@ class FileAdder {
 }
 
 const appender = new FileAdder("file.txt");
-
 const server = http.createServer((req, res) => {
-  const parsedUrl = url.parse(req.url, true);
+  const fullUrl = `http://${req.headers.host}${req.url}`;
+  const parsedUrl = new URL(fullUrl);
   
-  if (parsedUrl.pathname === "/COMP4537/labs/3/writeFile") {
-    const text = parsedUrl.query.text || "";
+  // Check the pathname exactly
+  if (parsedUrl.pathname === "/writeFile") {
+    const text = parsedUrl.searchParams.get("text") || "Text goes here";
 
-    try {
-      const message = appender.addText(text);
-      res.writeHead(200, { "Content-Type": "text/plain" });
-      res.end(message);
-    } catch (error) {
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end(error.message);
-    }
+    // Append the text to file.txt
+    fs.appendFileSync("file.txt", `${text}\n`);
+
+    const messenger = new Greet();
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end(`${text} : ${messenger.getMessage()}`);
   } else {
     res.writeHead(404, { "Content-Type": "text/plain" });
     res.end("Not Found");
   }
 });
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
